@@ -1,0 +1,8 @@
+README.md
+pyproject.toml
+mini_pihole_unbound.egg-info/PKG-INFO
+mini_pihole_unbound.egg-info/SOURCES.txt
+mini_pihole_unbound.egg-info/dependency_links.txt
+mini_pihole_unbound.egg-info/requires.txt
+mini_pihole_unbound.egg-info/top_level.txt
+tests/test_configuration.py

@@ -1,0 +1,56 @@
+services:
+  unbound:
+    image: klutchell/unbound:latest
+    container_name: pihole-unbound
+    restart: unless-stopped
+    ports:
+      - "5353:5353/udp"
+      - "5353:5353/tcp"
+    volumes:
+      - ./config/unbound:/opt/unbound/etc/unbound:ro
+    networks:
+      pihole_net:
+        ipv4_address: 172.20.0.2
+    healthcheck:
+      test: ["CMD-SHELL", "nslookup example.com 127.0.0.1 || drill @127.0.0.1 example.com || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  pihole:
+    image: pihole/pihole:latest
+    container_name: pihole
+    depends_on:
+      - unbound
+    restart: unless-stopped
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "80:80/tcp"
+      - "443:443/tcp"
+    environment:
+      TZ: UTC
+      WEBPASSWORD: ${PIHOLE_PASSWORD:-changeme}
+      FTLCONF_LOCAL_IPV4: ${PIHOLE_HOST_IP:-127.0.0.1}
+      PIHOLE_DNS_: "172.20.0.2#5353"
+      DNSMASQ_LISTENING: all
+    volumes:
+      - ./data/pihole:/etc/pihole
+      - ./data/dnsmasq:/etc/dnsmasq.d
+    cap_add:
+      - NET_ADMIN
+    networks:
+      pihole_net:
+        ipv4_address: 172.20.0.3
+    healthcheck:
+      test: ["CMD", "curl", "-fsSL", "http://localhost/admin"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+networks:
+  pihole_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24

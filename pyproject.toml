@@ -1,0 +1,15 @@
+[project]
+name = "mini-pihole-unbound"
+version = "0.1.0"
+description = "Lightweight Pi-hole and Unbound deployment"
+requires-python = ">=3.12"
+dependencies = [
+  "pytest>=8.0.0",
+  "pyyaml>=6.0.0",
+]
+
+[tool.setuptools]
+packages = []
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
